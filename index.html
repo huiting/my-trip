@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="東京自由行">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+  <title>東京自由行</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #292b2a;
+      --muted: #747773;
+      --paper: #f5f4f1;
+      --card: #fff;
+      --line: #e8e6e0;
+      --red: #c96858;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page { width: min(100% - 32px, 680px); margin: 0 auto; padding: 20px 0 44px; }
+    .tower-scene {
+      position: relative;
+      display: grid;
+      place-items: center;
+      height: min(66vh, 460px);
+      min-height: 340px;
+      overflow: hidden;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #e9e8e3 0%, #f3f1eb 72%, #e7e4dc 100%);
+    }
+    .tower-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .tower-label { position: absolute; z-index: 2; left: 20px; bottom: 18px; color: #545752; font-size: 13px; letter-spacing: .14em; }
+    h1 { margin: 26px 2px 4px; font-size: 34px; line-height: 1.25; letter-spacing: .04em; }
+    .subtitle { margin: 0 2px 26px; color: var(--muted); font-size: 15px; }
+    .greeting { margin: 0 0 22px; padding: 17px 19px; border-left: 3px solid var(--red); background: #fff; color: #555852; border-radius: 0 12px 12px 0; }
+    .section-title { margin: 30px 2px 12px; font-size: 20px; }
+    .plan { display: grid; gap: 10px; }
+    .item { display: grid; grid-template-columns: 62px 1fr; gap: 12px; padding: 15px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+    time { color: var(--red); font-weight: 700; font-size: 15px; }
+    .item strong { display: block; font-size: 17px; line-height: 1.45; }
+    .item .icon { display: inline; margin: 0 .32em 0 0; font-size: 1em; line-height: 1; vertical-align: baseline; }
+    .item span { display: block; color: var(--muted); font-size: 14px; margin-top: 3px; }
+    footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; font-size: 13px; }
+    .vote-form { display: grid; gap: 12px; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+    .vote-field { display: grid; gap: 4px; color: var(--muted); font-size: 14px; }
+    .vote-field input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); font: inherit; }
+    .vote-form button { justify-self: start; padding: 10px 16px; border: 0; border-radius: 9px; background: var(--red); color: #fff; font: inherit; cursor: pointer; }
+    .vote-form button:disabled { opacity: .6; cursor: wait; }
+    .vote-results { display: grid; gap: 10px; margin-top: 10px; }
+    .vote-results .item { grid-template-columns: 1fr auto; align-items: center; }
+    .vote-results .item span { margin: 0; text-align: right; }
+    .vote-status { min-height: 1.65em; margin: 0; color: var(--muted); font-size: 14px; }
+    @media (min-width: 560px) { .page { padding-top: 32px; } .tower-scene { height: 460px; } .item { padding: 18px 20px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="tower-scene" role="img" aria-label="幾何線條風格的東京鐵塔">
+      <img class="tower-art" src="./images/cover.webp" alt="東京鐵塔、紅燈籠與綠色植物的手繪水彩插畫">
+    </section>
+    <h1>東京自由行</h1>
+    <p class="subtitle">2026/10/15 – 10/20｜和爸媽一起，慢慢逛東京</p>
+
+    <section aria-labelledby="day-1015">
+      <h2 class="section-title" id="day-1015">10/15（四）｜抵達東京</h2>
+      <div class="plan">
+        <div class="item"><time>12:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>出發桃園機場</strong></div></div>
+        <div class="item"><time>15:30</time><div><strong><span class="icon" aria-hidden="true">🚶</span>TPE 桃園 → NRT 東京成田</strong><span>15:30 T1 起飛 → 19:55 T2 抵達</span></div></div>
+        <div class="item"><time>22:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>Skyliner</strong></div></div>
+        <div class="item"><time>23:00</time><div><strong><span class="icon" aria-hidden="true">🍜</span>晚餐、休息</strong></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="day-1016">
+      <h2 class="section-title" id="day-1016">10/16（五）｜上野・淺草・晴空塔</h2>
+      <div class="plan">
+        <div class="item"><time>08:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>飯店 → 上野東照宮</strong><span>京濱東北線：川口站 → 上野站（230円），約 15–20 分；再步行約 15–20 分。</span></div></div>
+        <div class="item"><time>09:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>① 上野東照宮</strong></div></div>
+        <div class="item"><time>10:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>② 國立西洋美術館 或 上野動物園｜二選一</strong><span>國立西洋美術館 500円；上野動物園 600円。皆需門票。</span></div></div>
+        <div class="item"><time>11:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>前往 MOMO PARADISE</strong><span>上野東照宮周邊步行約 10–20 分 → 東京 Metro 銀座線上野站搭至淺草站（180円），再步行約 3 分。</span></div></div>
+        <div class="item"><time>12:00</time><div><strong><span class="icon" aria-hidden="true">🍜</span>午餐｜MOMO PARADISE</strong></div></div>
+        <div class="item"><time>14:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>③ 淺草寺、雷門</strong></div></div>
+        <div class="item"><time>15:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>④ 葛西臨海水族園 或 墨田水族館｜二選一</strong><span>葛西臨海水族園 700円；墨田水族館 2,700円。皆需門票。</span></div></div>
+        <div class="item"><time>19:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑤ 東京晴空塔（UQ）</strong></div></div>
+        <div class="item"><time>21:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>返回飯店</strong><span>押上搭淺草線至淺草，轉銀座線至上野（290円）；京濱東北線上野站至川口站（230円），約 15–20 分。</span></div></div>
+        <div class="item"><time>22:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑥ 不忍池</strong></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="day-1017">
+      <h2 class="section-title" id="day-1017">10/17（六）｜新橋・芝公園・東京鐵塔</h2>
+      <div class="plan">
+        <div class="item"><time>08:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>出發｜飯店 → JR 川口站 → 新橋站</strong><span>車程參考當下時間 By URL。</span></div></div>
+        <div class="item"><time>09:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>① 烏森神社</strong></div></div>
+        <div class="item"><time>09:30</time><div><strong><span class="icon" aria-hidden="true">📍</span>② 日比谷神社</strong></div></div>
+        <div class="item"><time>10:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>③（選）濱離宮恩賜庭園</strong><span>需門票，預算 ¥300。</span></div></div>
+        <div class="item"><time>11:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>④ 芝公園寺社巡禮</strong><span>芝大神宮、增上寺安國殿、寶珠院、芝東照宮。</span></div></div>
+        <div class="item"><time>12:30</time><div><strong><span class="icon" aria-hidden="true">🍜</span>午餐</strong></div></div>
+        <div class="item"><time>14:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑦ 國立新美術館｜Louvre 文藝復興展</strong></div></div>
+        <div class="item"><time>16:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑤ 東京鐵塔</strong><span>需門票，1,500円；展望台內咖啡廳。</span></div></div>
+        <div class="item"><time>20:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑥ 麻布台之丘</strong></div></div>
+        <div class="item"><time>21:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑧（選）渋谷（澀谷）逛街</strong></div></div>
+        <div class="item"><time>22:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>返回飯店</strong></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="day-1018">
+      <h2 class="section-title" id="day-1018">10/18（日）｜輕井澤</h2>
+      <div class="plan">
+        <div class="item"><time>08:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>飯店出發</strong></div></div>
+        <div class="item"><time>10:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>① 白糸瀑布</strong></div></div>
+        <div class="item"><time>12:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>② 聖保羅天主教堂</strong></div></div>
+        <div class="item"><time>15:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>③ 雲場池</strong></div></div>
+        <div class="item"><time>16:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>④ 榆樹街小鎮</strong></div></div>
+        <div class="item"><time>18:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>返回川口</strong></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="day-1019">
+      <h2 class="section-title" id="day-1019">10/19（一）｜鎌倉・江之島</h2>
+      <div class="plan">
+        <div class="item"><time>07:30</time><div><strong><span class="icon" aria-hidden="true">🚶</span>川口 → 鎌倉</strong><span>京濱東北線川口站 → 新橋站（約 15–20 分），轉橫須賀線新橋站 → 鎌倉站（約 50–55 分），車資 1,230円；下車後步行約 15–20 分。</span></div></div>
+        <div class="item"><time>09:30</time><div><strong><span class="icon" aria-hidden="true">📍</span>① 小町通方向散步</strong></div></div>
+        <div class="item"><time>09:50</time><div><strong><span class="icon" aria-hidden="true">📍</span>② 鶴岡八幡宮</strong></div></div>
+        <div class="item"><time>11:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>③ 鎌倉大佛（高德院）</strong></div></div>
+        <div class="item"><time>12:00</time><div><strong><span class="icon" aria-hidden="true">🍜</span>午餐｜鎌倉大佛午餐</strong></div></div>
+        <div class="item"><time>14:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>④ 長谷寺</strong></div></div>
+        <div class="item"><time>15:00</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑤ 鎌倉高校前站</strong></div></div>
+        <div class="item"><time>15:40</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑥ 江之島神社、商店街</strong></div></div>
+        <div class="item"><time>16:30</time><div><strong><span class="icon" aria-hidden="true">📍</span>⑦ Sea Candle 展望台</strong></div></div>
+        <div class="item"><time>18:30</time><div><strong><span class="icon" aria-hidden="true">🍜</span>⑧ 商店街晚餐</strong></div></div>
+        <div class="item"><time>19:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>江之島 → 川口</strong><span>商店街步行約 10–15 分至江之島站，搭江之電至藤澤站（約 10 分），轉 JR 東海道本線／宇都宮線至赤羽站（約 65 分），再搭京濱東北線至川口站（約 3 分）；車資 1,230円，約 2 小時。</span></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="day-1020">
+      <h2 class="section-title" id="day-1020">10/20（二）｜上野・返程</h2>
+      <div class="plan">
+        <div class="item"><time>09:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>退房｜飯店 → 上野站</strong><span>京濱東北線川口站 → 上野站（230円），約 15–20 分。</span></div></div>
+        <div class="item"><time>09:45</time><div><strong><span class="icon" aria-hidden="true">🚶</span>寄物</strong></div></div>
+        <div class="item"><time>10:00</time><div><strong><span class="icon" aria-hidden="true">🍜</span>⑥ 阿美橫町（吃＆買）</strong><span>二木菓子、藥妝、商店街。</span></div></div>
+        <div class="item"><time>11:30</time><div><strong><span class="icon" aria-hidden="true">🍜</span>午餐</strong></div></div>
+        <div class="item"><time>13:30</time><div><strong><span class="icon" aria-hidden="true">📍</span>逛街</strong><span>爸休息：問男友咖啡廳。</span></div></div>
+        <div class="item"><time>15:00</time><div><strong><span class="icon" aria-hidden="true">🚶</span>取行李，前往京成上野站、搭車前往成田機場</strong></div></div>
+        <div class="item"><time>15:30</time><div><strong><span class="icon" aria-hidden="true">🚶</span>Skylinner</strong></div></div>
+        <div class="item"><time>20:45</time><div><strong><span class="icon" aria-hidden="true">🚶</span>NRT 東京成田 → TPE 桃園</strong><span>20:45 T2 起飛 → 23:25 T1 抵達。</span></div></div>
+        <div class="item"><time>23:40</time><div><strong><span class="icon" aria-hidden="true">🚶</span>桃園機場返家</strong></div></div>
+      </div>
+    </section>
+    <section aria-labelledby="dinner-vote-title">
+      <h2 class="section-title" id="dinner-vote-title">晚餐投票</h2>
+      <form class="vote-form" id="dinner-vote-form">
+        <label class="vote-field" for="dinner-nickname">
+          暱稱
+          <input id="dinner-nickname" name="nickname" type="text" maxlength="80" autocomplete="nickname" required>
+        </label>
+        <label class="vote-field" for="dinner-option">
+          選項
+          <input id="dinner-option" name="option" type="text" maxlength="120" list="dinner-option-list" required>
+          <datalist id="dinner-option-list"></datalist>
+        </label>
+        <button type="submit">送出投票</button>
+        <p class="vote-status" id="dinner-vote-status" role="status" aria-live="polite"></p>
+      </form>
+      <div class="plan vote-results" id="dinner-vote-results" aria-live="polite"></div>
+    </section>
+    <footer>旅途愉快・時間與交通資訊可依當日狀況調整</footer>
+  </main>
+  <script>
+    const SUPABASE_URL = "https://oqbvdgzgpndjhvudzrrv.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4vfS2w9EP1YPZDnFFX3n_w_iJdL-2Jn";
+    const votesEndpoint = `${SUPABASE_URL}/rest/v1/dinner_votes`;
+    const voteForm = document.querySelector("#dinner-vote-form");
+    const voteResults = document.querySelector("#dinner-vote-results");
+    const voteStatus = document.querySelector("#dinner-vote-status");
+    const optionSuggestions = document.querySelector("#dinner-option-list");
+    const submitButton = voteForm.querySelector("button[type=submit]");
+
+    async function loadDinnerVotes() {
+      const response = await fetch(`${votesEndpoint}?select=nickname%2Coption`, {
+        headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Accept: "application/json" },
+        cache: "no-store"
+      });
+      if (!response.ok) throw new Error(`讀取投票失敗（${response.status}）`);
+
+      const votes = await response.json();
+      const counts = new Map();
+      for (const vote of votes) counts.set(vote.option, (counts.get(vote.option) || 0) + 1);
+
+      voteResults.replaceChildren();
+      optionSuggestions.replaceChildren();
+      if (counts.size === 0) {
+        const empty = document.createElement("div");
+        empty.className = "item";
+        empty.textContent = "目前還沒有投票";
+        voteResults.append(empty);
+        return;
+      }
+
+      for (const [option, count] of [...counts].sort(([a], [b]) => a.localeCompare(b, "zh-Hant"))) {
+        const row = document.createElement("div");
+        row.className = "item";
+        const name = document.createElement("strong");
+        name.textContent = option;
+        const total = document.createElement("span");
+        total.textContent = `${count} 票`;
+        row.append(name, total);
+        voteResults.append(row);
+
+        const suggestion = document.createElement("option");
+        suggestion.value = option;
+        optionSuggestions.append(suggestion);
+      }
+    }
+
+    voteForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const nickname = voteForm.elements.nickname.value.trim();
+      const option = voteForm.elements.option.value.trim();
+      if (!nickname || !option) return;
+
+      submitButton.disabled = true;
+      voteStatus.textContent = "正在送出投票…";
+      try {
+        const response = await fetch(votesEndpoint, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
+          body: JSON.stringify({ nickname, option })
+        });
+        if (!response.ok) throw new Error(`投票送出失敗（${response.status}）`);
+        voteStatus.textContent = "投票成功，票數已更新。";
+        voteForm.elements.option.value = "";
+        await loadDinnerVotes();
+      } catch (error) {
+        voteStatus.textContent = error instanceof Error ? error.message : "投票失敗，請稍後再試。";
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    loadDinnerVotes().catch((error) => {
+      voteStatus.textContent = error instanceof Error ? error.message : "目前無法載入投票。";
+    });
+  </script>
+</body>
+</html>
