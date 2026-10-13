@@ -335,7 +335,7 @@
     document.querySelectorAll("section[aria-labelledby^='day-'] .plan").forEach((plan) => {
       const items = [...plan.querySelectorAll(":scope > .item")];
       const routePoint = (item) => {
-        const label = item.querySelector("strong")?.textContent
+        const label = item.querySelector("strong, .place-trigger")?.textContent
           .replace(/^[🚶📍🍜🍧]\s*/u, "")
           .replace(/^[①②③④⑤⑥⑦⑧]\s*/u, "")
           .replace(/（選）/gu, "")
@@ -346,9 +346,10 @@
       };
 
       for (let index = 1; index < items.length; index += 1) {
+        if (!items[index].querySelector(".place-trigger")) continue;
         const origin = routePoint(items[index - 1]);
         const destination = routePoint(items[index]);
-        if (!origin || !destination) continue;
+        if (!origin || !destination || origin === destination) continue;
 
         const link = document.createElement("a");
         link.className = "route-link";
