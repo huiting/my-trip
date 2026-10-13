@@ -53,6 +53,8 @@
     .item { display: grid; grid-template-columns: 62px 1fr; gap: 12px; padding: 15px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
     time { color: var(--red); font-weight: 700; font-size: 15px; }
     .item strong { display: block; font-size: 17px; line-height: 1.45; }
+    .item .place-trigger { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; font: inherit; font-size: 17px; font-weight: 700; line-height: 1.45; cursor: pointer; }
+    .place-trigger:focus-visible, .place-dialog button:focus-visible { outline: 3px solid #c96858; outline-offset: 4px; border-radius: 4px; }
     .item .icon { display: inline; margin: 0 .32em 0 0; font-size: 1em; line-height: 1; vertical-align: baseline; }
     .item span { display: block; color: var(--muted); font-size: 14px; margin-top: 3px; }
     footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; font-size: 13px; }
@@ -65,6 +67,19 @@
     .vote-results .item { grid-template-columns: 1fr auto; align-items: center; }
     .vote-results .item span { margin: 0; text-align: right; }
     .vote-status { min-height: 1.65em; margin: 0; color: var(--muted); font-size: 14px; }
+    .place-dialog { width: min(92vw, 440px); max-height: min(88vh, 720px); padding: 0; overflow: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); color: var(--ink); box-shadow: 0 24px 80px #24231f40; }
+    .place-dialog::backdrop { background: #20211fcc; backdrop-filter: blur(3px); }
+    .place-dialog-inner { padding: 18px; }
+    .place-dialog-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .place-kicker { margin: 0; color: var(--red); font-size: 12px; letter-spacing: .12em; }
+    .place-close { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--ink); font-size: 24px; line-height: 1; cursor: pointer; }
+    .place-dialog h2 { margin: 7px 0 12px; font-size: 24px; line-height: 1.35; }
+    .place-photo { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; overflow: hidden; border-radius: 14px; background: #e9e8e3; }
+    .place-photo-status { display: grid; place-items: center; min-height: 190px; padding: 20px; border-radius: 14px; background: #e9e8e3; color: var(--muted); text-align: center; font-size: 14px; }
+    .place-credit { margin: 6px 2px 0; color: var(--muted); font-size: 12px; }
+    .place-credit a { color: inherit; text-underline-offset: 2px; }
+    .place-description { margin: 14px 2px 4px; color: #555852; font-size: 16px; line-height: 1.75; }
+    @media (prefers-reduced-motion: no-preference) { .place-dialog[open] { animation: place-in .18s ease-out; } @keyframes place-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } } }
     @media (min-width: 560px) { .page { padding-top: 32px; } .tower-scene { height: 460px; } .item { padding: 18px 20px; } }
   </style>
 </head>
@@ -181,7 +196,139 @@
     </section>
     <footer>旅途愉快・時間與交通資訊可依當日狀況調整</footer>
   </main>
+  <dialog class="place-dialog" id="place-dialog" aria-labelledby="place-title">
+    <div class="place-dialog-inner">
+      <div class="place-dialog-top"><p class="place-kicker">景點小介紹</p><button class="place-close" type="button" aria-label="關閉景點介紹">×</button></div>
+      <h2 id="place-title"></h2>
+      <div id="place-art"></div>
+      <p class="place-description" id="place-description"></p>
+    </div>
+  </dialog>
   <script>
+    const placeDialog = document.querySelector("#place-dialog");
+    const placeTitle = document.querySelector("#place-title");
+    const placeArt = document.querySelector("#place-art");
+    const placeDescription = document.querySelector("#place-description");
+    const placeInfo = [
+      ["上野東照宮", "shrine", "上野公園裡供奉德川家康的神社。金色裝飾與莊嚴的唐門很有特色，周邊也適合慢慢散步。"],
+      ["國立西洋美術館", "museum", "由建築師勒・柯比意設計，館藏以西方藝術為主。入口周邊的雕塑和建築本身也值得欣賞。"],
+      ["上野動物園", "garden", "東京歷史悠久的動物園，園區分成東園與西園。可以依體力挑選想看的區域，留意園內步行距離。"],
+      ["淺草寺", "shrine", "東京知名的佛教寺院，從雷門、仲見世通一路走到本堂，沿途能感受淺草熱鬧的老街氣氛。"],
+      ["雷門", "street", "淺草寺入口的大紅燈籠是淺草的代表景象。從燈籠下穿過後就是仲見世商店街。"],
+      ["葛西臨海水族園", "aquarium", "以玻璃圓頂和大型水槽聞名，能欣賞海洋生物與企鵝。園區靠海，天氣好時也可順遊臨海公園。"],
+      ["墨田水族館", "aquarium", "位在東京晴空塔城內的都市型水族館，水槽展示簡潔舒適，也能近距離觀察企鵝與水母。"],
+      ["東京晴空塔", "tower", "高聳的電波塔是東京東側醒目的地標。晴空塔城集合商店與餐飲，展望台可俯瞰城市景色。"],
+      ["不忍池", "water", "上野公園中的池塘與步道，蓮池、弁天堂和水鳥構成悠閒景色。散步時可在池畔稍作休息。"],
+      ["烏森神社", "shrine", "位於新橋街區的小巧神社，以色彩鮮明的授與品聞名。可以順道感受商業街巷裡安靜的一角。"],
+      ["日比谷神社", "shrine", "座落於新橋與汐留一帶的神社，建築與周遭高樓形成有趣對比，適合短暫停留參拜。"],
+      ["濱離宮恩賜庭園", "garden", "面向東京灣的江戶時代庭園，池水、松樹與茶屋相映。園內步道寬敞，適合放慢腳步欣賞景色。"],
+      ["芝公園寺社巡禮", "shrine", "芝大神宮、增上寺安國殿、寶珠院與芝東照宮分布在芝公園周邊，可沿綠意步道串成一段散步路線。"],
+      ["國立新美術館", "museum", "以波浪形玻璃外牆和明亮中庭著稱，本身沒有固定館藏，主要舉辦期間限定展覽。入館前可確認展覽安排。"],
+      ["東京鐵塔", "tower", "東京經典地標，紅白塔身在城市間格外醒目。芝公園一帶有多個角度可以欣賞塔景，展望台則能遠望市區。"],
+      ["麻布台之丘", "tower", "融合綠地、商店與辦公空間的城市街區，步道連接不同建築。可在周邊散步並欣賞現代建築景觀。"],
+      ["渋谷", "street", "東京熱鬧的購物與娛樂區，十字路口、人潮和店舖是經典街景。逛街時可依興趣安排停留時間。"],
+      ["白糸瀑布", "waterfall", "水流沿著弧形岩壁細細落下，像白色絲線般鋪展。森林環抱的瀑布步道清涼平緩，適合停留觀景。"],
+      ["聖保羅天主教堂", "church", "輕井澤具代表性的木造教堂，由建築師安東尼・雷蒙設計。簡潔的尖頂與周遭樹林融合，參觀時請保持安靜。"],
+      ["雲場池", "water", "被樹林環繞的安靜池塘，環池步道平坦好走。水面映出四季景色，適合輕鬆散步與拍照。"],
+      ["榆樹街小鎮", "street", "星野區域的林間小鎮，木造店舖沿溪流與步道排列。可以逛特色小店、喝飲料，享受悠閒的森林氛圍。"],
+      ["小町通", "street", "鎌倉站通往鶴岡八幡宮方向的熱鬧商店街，沿途有小吃、伴手禮店與特色小店。"],
+      ["鶴岡八幡宮", "shrine", "鎌倉重要的神社，參道由車站方向一路延伸至本宮。朱紅色建築與舞殿是境內醒目的景觀。"],
+      ["鎌倉大佛", "buddha", "高德院的青銅阿彌陀佛像是鎌倉代表景點之一。大佛端坐在戶外，周圍庭園也留有寧靜的參觀空間。"],
+      ["長谷寺", "garden", "依山而建的寺院，可沿階梯欣賞庭園、觀音堂與海景。寺內季節花卉也很受歡迎，參觀時可慢慢走。"],
+      ["鎌倉高校前站", "water", "江之電沿線的小車站，附近可望見海岸與鐵道交會的風景。請在安全區域停留，避免走入車道或軌道。"],
+      ["江之島神社", "shrine", "由島上多處社殿組成的神社，沿參道上行可看見朱紅鳥居與海島景色。島上坡道和階梯較多，可按體力安排。"],
+      ["Sea Candle", "tower", "江之島頂部的展望燈塔，從高處可眺望湘南海岸。天氣晴朗時視野開闊，夜間也能欣賞點燈景色。"],
+      ["阿美橫町", "street", "上野與御徒町之間的熱鬧商店街，聚集零食、藥妝與各式店舖，適合邊走邊逛、採買伴手禮。"],
+      ["逛街", "street", "這一站留作彈性購物時間，可依當天精神和附近店家安排；同行家人也能找間咖啡店休息。"]
+    ];
+    const photoSearch = {
+      "上野東照宮": "Ueno Toshogu Shrine", "國立西洋美術館": "National Museum of Western Art Tokyo",
+      "上野動物園": "Ueno Zoo Tokyo", "淺草寺": "Sensoji Temple Asakusa", "雷門": "Kaminarimon Tokyo",
+      "葛西臨海水族園": "Tokyo Sea Life Park Kasai Rinkai Aquarium", "墨田水族館": "Sumida Aquarium Tokyo",
+      "東京晴空塔": "Tokyo Skytree", "不忍池": "Shinobazu Pond Ueno", "烏森神社": "Karasumori Shrine Tokyo",
+      "日比谷神社": "Hibiya Shrine Tokyo", "濱離宮恩賜庭園": "Hamarikyu Gardens Tokyo",
+      "芝公園寺社巡禮": "Zojoji Temple Tokyo Shiba Park", "國立新美術館": "The National Art Center Tokyo",
+      "東京鐵塔": "Tokyo Tower Japan", "麻布台之丘": "Azabudai Hills Tokyo", "渋谷": "Shibuya Crossing Tokyo",
+      "白糸瀑布": "Shiraito Falls Karuizawa", "聖保羅天主教堂": "St Paul's Catholic Church Karuizawa",
+      "雲場池": "Kumoba Pond Karuizawa", "榆樹街小鎮": "Harunire Terrace Karuizawa",
+      "小町通": "Komachi Street Kamakura", "鶴岡八幡宮": "Tsurugaoka Hachimangu Shrine",
+      "鎌倉大佛": "Great Buddha of Kamakura", "長谷寺": "Hasedera Temple Kamakura",
+      "鎌倉高校前站": "Kamakurakokomae Station", "江之島神社": "Enoshima Shrine",
+      "Sea Candle": "Enoshima Sea Candle", "阿美橫町": "Ameyoko Market Tokyo", "逛街": "Ueno shopping street Tokyo"
+    };
+    async function loadPlacePhoto(placeName) {
+      const searchName = photoSearch[placeName] || placeName;
+      const status = document.createElement("div");
+      status.className = "place-photo-status";
+      status.textContent = "正在尋找景點實拍照片…";
+      placeArt.replaceChildren(status);
+      const credit = document.createElement("p");
+      credit.className = "place-credit";
+      placeArt.append(credit);
+      try {
+        const searchUrl = new URL("https://commons.wikimedia.org/w/api.php");
+        searchUrl.search = new URLSearchParams({ action: "query", list: "search", srnamespace: "6", srlimit: "5", srsearch: searchName, format: "json", origin: "*" });
+        const searchResponse = await fetch(searchUrl);
+        if (!searchResponse.ok) throw new Error("照片搜尋失敗");
+        const { query } = await searchResponse.json();
+        const file = query?.search?.find(({ title }) => /\.(jpe?g|png|webp)$/i.test(title));
+        if (!file) throw new Error("找不到照片");
+        const imageUrl = new URL("https://commons.wikimedia.org/w/api.php");
+        imageUrl.search = new URLSearchParams({ action: "query", titles: file.title, prop: "imageinfo", iiprop: "url|extmetadata", iiurlwidth: "1000", format: "json", origin: "*" });
+        const imageResponse = await fetch(imageUrl);
+        if (!imageResponse.ok) throw new Error("照片讀取失敗");
+        const imageData = await imageResponse.json();
+        const page = Object.values(imageData.query.pages)[0];
+        const info = page.imageinfo?.[0];
+        if (!info) throw new Error("照片讀取失敗");
+        const photo = document.createElement("img");
+        photo.className = "place-photo";
+        photo.alt = `${placeName}實景照片`;
+        photo.loading = "lazy";
+        photo.src = info.thumburl || info.url;
+        photo.addEventListener("error", () => { photo.replaceWith(Object.assign(document.createElement("div"), { className: "place-photo-status", textContent: "照片載入失敗，請確認網路連線。" })); }, { once: true });
+        const source = document.createElement("a");
+        source.href = `https://commons.wikimedia.org/wiki/${encodeURIComponent(file.title.replaceAll(" ", "_"))}`;
+        source.target = "_blank";
+        source.rel = "noopener noreferrer";
+        const metadata = info.extmetadata || {};
+        const author = metadata.Artist?.value ? new DOMParser().parseFromString(metadata.Artist.value, "text/html").body.textContent.trim() : "作者資料見來源頁";
+        const license = metadata.LicenseShortName?.value || "授權資料見來源頁";
+        source.textContent = `照片：${file.title.replace(/^File:/, "")}｜${author}｜${license}（Wikimedia Commons）`;
+        placeArt.replaceChildren(photo, credit);
+        credit.append(source);
+      } catch {
+        status.textContent = "暫時無法載入實景照片，請確認網路連線後再試。";
+      }
+    }
+
+    document.querySelectorAll(".item strong:has(.icon)").forEach((label) => {
+      if (label.querySelector(".icon").textContent.trim() !== "📍") return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "place-trigger";
+      button.setAttribute("aria-haspopup", "dialog");
+      button.setAttribute("aria-label", `查看景點介紹：${label.textContent.trim()}`);
+      button.innerHTML = label.innerHTML;
+      label.replaceWith(button);
+      button.addEventListener("click", () => {
+        const text = button.textContent.replace("📍", "").trim();
+        const matches = placeInfo.filter(([name]) => text.includes(name));
+        const places = matches.length ? matches : [[text.replace(/^[①②③④⑤⑥⑦⑧]（選）?\s*/, ""), "street", "這個地點適合依當天步調停留，沿途可慢慢觀察街區與周邊景色。"]];
+        const [name, , description] = places[0];
+        placeTitle.textContent = places.length > 1 ? places.map(([place]) => place).join("／") : name;
+        loadPlacePhoto(name);
+        placeDescription.textContent = places.length > 1
+          ? places.map(([place, , intro]) => `${place}：${intro}`).join(" ")
+          : description;
+        placeDialog.showModal();
+      });
+    });
+    placeDialog.querySelector(".place-close").addEventListener("click", () => placeDialog.close());
+    placeDialog.addEventListener("click", (event) => {
+      if (event.target === placeDialog) placeDialog.close();
+    });
+
     const SUPABASE_URL = "https://oqbvdgzgpndjhvudzrrv.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4vfS2w9EP1YPZDnFFX3n_w_iJdL-2Jn";
     const votesEndpoint = `${SUPABASE_URL}/rest/v1/dinner_votes`;
